@@ -118,6 +118,7 @@ end
 
 function love.draw()
 	love.graphics.print("Key: "..CDur.tonic.."-"..CDur.scaleName,300,280)
+	love.graphics.print("left mousebutton: random major key,\nright mousebutton: random minor key\nmousewheel: tempo up/down", 300, 320)
 	--[[
 	-------------------- DON'T MIND THIS ---------------------------
 	love.graphics.print("Tonic Major Chord:"..CDur:tonicChord(), 300, 320)
@@ -127,7 +128,7 @@ function love.draw()
 	love.graphics.print("Synthesizer 1 |\n Frequency:"..synthie.pitch.rate, 300, 400 )
 	love.graphics.print("Polyphony:"..#synthie.syn,300,440)
 	--]]
-	love.graphics.print("Played Chord:"..chord[1].."/"..chord[2].."/"..chord[3],300,340)	
+	love.graphics.print("Played Chord:"..chord[1].."/"..chord[2].."/"..chord[3],300,400)	
 	
 	love.graphics.scale(7)
 	for i=1,100 do
