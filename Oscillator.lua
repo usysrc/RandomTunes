@@ -9,22 +9,30 @@ function Oscillator:new(o, mode)
 	setmetatable(o, self)
 	self.__index = self
 	o.mode = mode or "sin"
+	o.lfo = 0
 	return o
 end
 
 function Oscillator:func(f,r)
 	if self.mode == "sin" then
-		-- placeholder : a simple sine wave
+		-- a simple sine wave
 	 return math.sin(2 * math.pi *f)
 	elseif self.mode == "saw" then
-	-- a simple saw wave
+		-- a simple saw wave
 		return f%1
 	elseif self.mode == "square" then
-	-- a simple square wave
-	if f%1 < .5 then return -1 else return 1 end
+		-- a simple square wave
+		if f%1 < .5 then return -1 else return 1 end
 	elseif self.mode == "whitenoise" then
-	-- whitenoise
-	return math.random()*2-1
+		-- whitenoise
+		return math.random()*2-1
+	elseif self.mode == "bassdrum" then
+		-- bassdrum
+		self.lfo = self.lfo + 1/44100
+		if self.lfo > 2*math.pi then self.lfo = self.lfo - 2*math.pi end
+		local lfofreq = 10
+		local lfo = self.lfo * lfofreq
+		return math.sin(2 * math.pi *f*(2*math.pi-lfo))*0.05
 	end
 end
 
@@ -180,11 +188,17 @@ function Synth:play()
 	-- normalize the volume on all playing synths, remove the stopped ones
 	rem = 0
 	for i,v in ipairs(self.syn) do
-		v:setVolume(self.amp *  1/#self.syn)
-		if v:isStopped() then rem = i end
+		
+		if v:isStopped() then rem = i
+		else
+			
+		end
 	end
 	if rem ~=0 then
 		table.remove(self.syn,rem)
+	end
+	for i,v in ipairs(self.syn) do
+		v:setVolume(self.amp *  1/#self.syn)
 	end
 end
 

@@ -6,11 +6,18 @@ require "Oscillator"
 math.randomseed(os.time())
 math.random();math.random();math.random()
 function love.load()
-	CDur = Scale:new(CDur,"e","minor")
+	CDur = Scale:new(CDur,"f","minor")
 	
 	-- a small lead synth
+	lead = Synth:new()
+	lead:init()
+	lead.amp = 0.6
+	lead:setOsc("saw")
+	
+	-- a small sin synth
 	synthie = Synth:new()
 	synthie:init()
+	synthie.amp = 0.2
 	synthie:setOsc("sin")
 	
 	-- a small bass synth
@@ -18,13 +25,20 @@ function love.load()
 	bass:init()
 	bass:setOsc("square")
 	
+	-- a basic bassdrum
+	bassdrum = Synth:new()
+	bassdrum:init()
+	bassdrum:setOsc("bassdrum")
+	bassdrum:set("h",0, 0.1)
+	bassdrum.amp = 0.3 
+	
 	-- some snare synthie
 	snaresynth = Synth:new()
 	snaresynth:init()
 	snaresynth:setOsc("whitenoise")
 	snaresynth:set("c", 3, 0.03)
-	
-	bpm = 120
+	bars = 1
+	bpm = 10
 	fourchords = {1,4,5,1}
 	udwn = 1
 	n = 0
@@ -36,6 +50,8 @@ function love.load()
 	degr = 1
 	chord = CDur:getChordOfDegree(degr)
 	x = 1
+	volume = 0
+	love.audio.setVolume(volume)
 end
 
 function love.update(dt)
@@ -43,7 +59,13 @@ function love.update(dt)
 	-- for 1/8th or 1/16th trigger
 	--
 	--
-
+	if volume < 1 then
+		volume = volume + dt * 0.1
+		love.audio.setVolume(volume)
+	end
+	if bpm < 120 then
+		bpm = bpm + dt * 10
+	end
 	if t>=(1/8) * 1/(bpm/60) then
 		
 		-- on 1/32th trigger
@@ -52,49 +74,54 @@ function love.update(dt)
 			arp = arp + udwn
 			if arp == 3 then udwn= -1 end
 			if arp ==1 then udwn = 1 end
-			synthie:set(chord[arp], 4+g%3,(1/8)*(1/(bpm/60)))
+			synthie:set(chord[arp], 4+n,(1/8)*(1/(bpm/60)))
 			synthie:play()
 
 		end
 		
 		if g%2 == 0 then
-			bass:set(chord[1], 2+g%3,(1/5)*1/(bpm/60))
+			bass:set(chord[1], 2,(1/5)*1/(bpm/60))
 			bass:play()
+		end
+		-- on beat(1/4th) trigger
+		if g%8	== 0 then
+			bassdrum:play()
 		end
 		
 		-- on beat(1/4th) trigger
-		if g%8 == 0 then
-			--snaresynth:set("c", 3, 0.02)
+		if g%4 == 0 then
 			snaresynth:play()
 			
 			-- for the arps
 			n = n + 1
 			if n >2 then n = 0 end
-			
+			if math.random(0,10)>5 then
+				--lead:set(chord[2], 4,2*(1/(bpm/60)))
+				--lead:play()
+			end
 		end
 		
 		-- on new bar trigger
 		if g%32 == 0 then
 			-- random degree harmony
 			degr = math.random(7)--degr + 2*math.random(0,1)-1
-			if degr>7 then degr = degr-7 end
-			if degr<1 then degr = degr + 7 end
+			if degr>6 then degr = 1 end
+			if degr<1 then degr = 6 end
 			x = x + 1
 			if x >#fourchords then x = 0 end
 			
 			chord = CDur:getChordOfDegree(degr)
-			--synthie:set(chord[1], 4,(1/(bpm/60)))
-			--synthie:play()
-			--synthie:setOsc("sin")
-			--synthie:set(chord[2], 4, 2 *1/(bpm/60))
-			--synthie:play()
-			--synthie:set(chord[1], 2,4*1/(bpm/60))
-			--synthie:play()
-			--synthie:setOsc("saw")
-			
+			if bars> 4 then
+				lead:set(chord[math.random(2,3)], 4,4*(1/(bpm/60)))
+				lead:play()
+			end
 		end
 		g = g + 1
-		if g > 32 then g = 1 end
+		if g > 32 then 
+			bars = bars + 1
+			g = 1 
+		end
+
 		t = 0
 	end
 	l = l +10* dt
@@ -117,8 +144,11 @@ function love.mousepressed(x,y,button)
 end
 
 function love.draw()
-	love.graphics.print("Key: "..CDur.tonic.."-"..CDur.scaleName,300,280)
-	love.graphics.print("left mousebutton: random major key,\nright mousebutton: random minor key\nmousewheel: tempo up/down", 300, 320)
+	love.graphics.print("left mousebutton: random major key,\nright mousebutton: random minor key\nmousewheel: tempo up/down", 0, 20)
+	
+	love.graphics.print("Key: "..CDur.tonic.."-"..CDur.scaleName,0,500)
+	love.graphics.print("Played Chord:"..chord[1].."/"..chord[2].."/"..chord[3],0,520)	
+	
 	--[[
 	-------------------- DON'T MIND THIS ---------------------------
 	love.graphics.print("Tonic Major Chord:"..CDur:tonicChord(), 300, 320)
@@ -128,8 +158,8 @@ function love.draw()
 	love.graphics.print("Synthesizer 1 |\n Frequency:"..synthie.pitch.rate, 300, 400 )
 	love.graphics.print("Polyphony:"..#synthie.syn,300,440)
 	--]]
-	love.graphics.print("Played Chord:"..chord[1].."/"..chord[2].."/"..chord[3],300,400)	
 	
+	-- crazy waveforms
 	love.graphics.scale(7)
 	local points = {}
 	for i=1,100 do
