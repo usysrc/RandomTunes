@@ -58,7 +58,7 @@ function love.update(dt)
 		end
 		
 		if g%2 == 0 then
-			bass:set(chord[1], 2+g%3,(1/4)*1/(bpm/60))
+			bass:set(chord[1], 2+g%3,(1/5)*1/(bpm/60))
 			bass:play()
 		end
 		
@@ -131,7 +131,10 @@ function love.draw()
 	love.graphics.print("Played Chord:"..chord[1].."/"..chord[2].."/"..chord[3],300,400)	
 	
 	love.graphics.scale(7)
+	local points = {}
 	for i=1,100 do
-		love.graphics.point(i*1, 300/7 + synthie.sd:getSample(l*100+i*10)*50)
+		points[#points+1] = i*1
+		points[#points+1] = 300/7 + synthie.sd:getSample(l*100+i*10)*50
 	end
+	love.graphics.line(points)
 end

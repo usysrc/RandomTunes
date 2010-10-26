@@ -128,7 +128,7 @@ function Synth:makeSample()
 	local rate = self.pitch.rate
 	local len = self.len
 	local samples = math.floor(len*sr)
-    local sd = love.sound.newSoundData(samples, sr, 16, 1)
+    local sd = love.sound.newSoundData(samples, sr, 8, 1)
 	local declick = 0
     k = 0
 	for i = 0,samples do
@@ -149,10 +149,10 @@ function Synth:makeSample()
 		-- sample distortion | cubic soft clipper https://ccrma.stanford.edu/~jos/pasp/Cubic_Soft_Clipper.html
 		-- better distortion would need oversampling
 		
-		osc = 1.8 * osc
-		if osc <= -1 then osc = -2/3 end
-		if osc>-1 and osc<1 then osc = osc - math.pow(osc,3)/3 end
-		if osc >= 1 then osc = 2/3 end
+		--osc = 1.8 * osc
+		--if osc <= -1 then osc = -2/3 end
+		--if osc>-1 and osc<1 then osc = osc - math.pow(osc,3)/3 end
+		--if osc >= 1 then osc = 2/3 end
 		
 		
 		osc = osc * self.amp
