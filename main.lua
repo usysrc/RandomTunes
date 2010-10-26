@@ -6,7 +6,7 @@ require "Oscillator"
 math.randomseed(os.time())
 math.random();math.random();math.random()
 function love.load()
-	CDur = Scale:new(CDur,"e","moll")
+	CDur = Scale:new(CDur,"e","minor")
 	
 	-- a small lead synthie
 	synthie = Synth:new()
@@ -96,14 +96,17 @@ end
 	
 function love.draw()
 	love.graphics.print(CDur.tonic.."-"..CDur.scaleName,300,280)
-	love.graphics.print("Tonleiter:"..CDur:printScale(), 300, 300)
-	love.graphics.print("Tonika Dur Akkord:"..CDur:tonicChord(), 300, 320)
-	love.graphics.print("Played Chord:"..chord[1].."/"..chord[2].."/"..chord[3],300,340)	
+	--[[
+	-------------------- DON'T MIND THIS ---------------------------
+	love.graphics.print("Tonic Major Chord:"..CDur:tonicChord(), 300, 320)
 	love.graphics.print("All Degrees:"..CDur:getAllDegrees(),300,360)
 	
 	love.graphics.print("BPM: "..bpm, 300,380)
 	love.graphics.print("Synthesizer 1 |\n Frequency:"..synthie.pitch.rate, 300, 400 )
 	love.graphics.print("Polyphony:"..#synthie.syn,300,440)
+	--]]
+	love.graphics.print("Played Chord:"..chord[1].."/"..chord[2].."/"..chord[3],300,340)	
+	
 	size = 100
 	for i=1,100 do
 		love.graphics.point(100+i*2, 100 + synthie.sd:getSample(l*100+i*10)*100)
