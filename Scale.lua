@@ -16,7 +16,8 @@ function Scale:new(o,tonic,scale)
 	o.refScaleRev = {["c"]=1,["c#"]=2,["d"]=3,["d#"]=4,["e"]=5,["f"]=6,["f#"]=7,["g"]=8,["g#"]=9,["a"]=10,["a#"]=11,["h"]=12}
 	
 	o.scale = {}
-	if o.scaleName ==  "Major" or "major" or "mj" or "dur" or "Dur" then
+	if o.scaleName ==  "Major" or o.scaleName ==  "major" or 
+	o.scaleName ==  "mj" or o.scaleName ==  "dur" or o.scaleName ==  "Dur" then
 		local k = o.refScaleRev[o.tonic]
 		for	i=1,8 do
 			if k>12 then k = k - 12 end
@@ -25,10 +26,10 @@ function Scale:new(o,tonic,scale)
 		end
 	else
 		local k = o.refScaleRev[o.tonic]
-		for	i=1,8 do
+		for	i=1,7 do
 			if k>12 then k = k - 12 end
 			o.scale[i] = o.refScale[k]
-			k = k + 2 * o.distScaleNaturalMinor[i]
+			k = k + 2 * o.distScaleNaturalMinor[math.floor(i)]
 		end
 	end
 	return o
@@ -41,6 +42,22 @@ function Scale:getRandomDegree()
 	return self:getDegree(k)
 end
 
+function Scale:setScale(tonic, scaleName)
+	self.tonic = tonic
+	self.scaleName = scaleName
+end
+
+function Scale:setRandomScale(tonic, scaleName)
+	local t = math.random(10)+1
+	self.tonic = tonic or self.refScale[t]
+	if math.random(10)>5 then
+		self.scaleName = scaleName or "minor"
+	else
+		self.scaleName = scaleName or "major"
+	end
+end
+
+-- return the scale as table
 function Scale:getScale()
 	ret = {}
 	for	i=1,8 do
